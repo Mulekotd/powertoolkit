@@ -29,9 +29,9 @@ PowerToolkit is a collection of PowerShell scripts designed to simplify various 
     .\setup.ps1
     ```
 
-### Scripts
+### Modules
 
-#### `backup.ps1`
+#### `New-Backup.psm1`
 
 A script to create backups of files or directories.
 
@@ -47,22 +47,23 @@ A script to create backups of files or directories.
 - To backup a directory:
 
     ```sh
-    backup -Directory -Path 'C:\MyFolder' -BackupLocation 'D:\Backups'
+    New-Backup -Directory -Path 'C:\MyFolder' -BackupLocation 'D:\Backups'
     ```
 
 - To backup a file:
 
     ```sh
-    backup -Path 'C:\MyFile.txt' -BackupLocation 'D:\Backups'
+    New-Backup -Path 'C:\MyFile.txt' -BackupLocation 'D:\Backups'
     ```
 
 ### Directory Structure
 
 ```sh
 C:.
+│   LECENSE
 │   README.md
 │   setup.ps1
 │
 └───modules
-        backup.ps1
+        New-Backup.psm1
 ```
