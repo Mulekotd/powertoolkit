@@ -37,7 +37,7 @@ function Backup-FileOrDirectory {
     $lowercasePath = $Path.ToLower()
 
     # Private Variables
-    Set-Variable -Name "archive_name" -Visibility Private
+    Set-Variable -Name "archiveName" -Visibility Private
 
     # Checking if the path is a directory or a file
     if ($Directory.IsPresent) {
@@ -46,7 +46,7 @@ function Backup-FileOrDirectory {
             exit
         }
         $item = Get-Item -Path $lowercasePath
-        $archive_name = $item.BaseName.ToLower().Replace(' ', '-')
+        $archiveName = $item.BaseName.ToLower().Replace(' ', '-')
         Write-Host "Starting backup of the directory: $Path"
     } else {
         if (-Not (Test-Path -Path $Path -PathType Leaf)) {
@@ -54,11 +54,11 @@ function Backup-FileOrDirectory {
             exit
         }
         $item = Get-Item -Path $lowercasePath
-        $archive_name = [System.IO.Path]::GetFileNameWithoutExtension($item.Name).ToLower().Replace(' ', '-')
+        $archiveName = [System.IO.Path]::GetFileNameWithoutExtension($item.Name).ToLower().Replace(' ', '-')
         Write-Host "Starting backup of the file: $Path"
     }
 
-    Write-Host "Backup location: $BackupLocation"
+    Write-Host "Backup location: $BackupLocation`n"
 
     # Create backup directory if it does not exist
     if (-Not (Test-Path -Path $BackupLocation -PathType Container)) {
@@ -66,11 +66,10 @@ function Backup-FileOrDirectory {
         Write-Host "Created backup directory: $BackupLocation"
     }
 
-    $zipPath = Join-Path -Path $BackupLocation -ChildPath "${archive_name}.zip"
+    $zipPath = Join-Path -Path $BackupLocation -ChildPath "${archiveName}.zip"
 
     # Compress the file or directory
     Compress-Archive -Path $Path -DestinationPath $zipPath
-
     Write-Host "Backup completed successfully. Backup file created at: $zipPath"
 }
 
