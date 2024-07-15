@@ -63,6 +63,7 @@ function CreateDirectories {
     # Update the contents of the user's PowerToolkit directory with the current directory
     Get-ChildItem -Path $currentDirectory -Recurse -Exclude '.git' | ForEach-Object {
         $destinationPath = $_.FullName -replace [regex]::Escape($currentDirectory), [regex]::Escape($destinationDirectory)
+        
         if ($_.PSIsContainer) {
             if (-not (Test-Path -Path $destinationPath)) {
                 New-Item -Path $destinationPath -ItemType Directory | Out-Null
