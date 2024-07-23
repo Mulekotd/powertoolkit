@@ -2,11 +2,12 @@
 $username = [System.Environment]::UserName
 $destinationDirectory = "C:\Users\$username\PowerToolkit"
 $scriptsDirectory = Join-Path -Path $destinationDirectory -ChildPath "modules"
-$initScript = Join-Path -Path $destinationDirectory -ChildPath "Initialize-PowerToolkit.psm1"
+$settingsDirectory = Join-Path -Path $scriptsDirectory -ChildPath ".settings"
+$initScript = Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1"
 #endregion
 
 #region Functions
-function Get-Role {
+function GetUserRole {
     $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Output "This script requires administrative privileges. Please run as an administrator."
@@ -18,10 +19,10 @@ function RemoveDirectories {
     Write-Output "Taking ownership of the directory: $destinationDirectory"
     takeown /r /f $destinationDirectory | Out-Null
 
-    Write-Output "Granting full control to the directory: $destinationDirectory"
+    Write-Output "Granting full control to the directory: $destinationDirectory`n"
     icacls $destinationDirectory /grant *S-1-5-32-544:F /t /c /q | Out-Null
 
-    Write-Output "`nChanging directory to C:\"
+    Write-Output "Changing directory to C:\`n"
     Set-Location -Path C:\
 
     Write-Output "Removing the directory: $destinationDirectory"
@@ -33,11 +34,11 @@ function RemoveInitializationFromProfile {
     $profilePath = $PROFILE
     
     if (Test-Path $profilePath) {
-        $profileContent = Get-Content -Path $profilePath -Raw
-        $initCommand = "Import-Module -Name `"$initScript`" -Global"
+        $profileContent = Get-Content -Path $profilePath
+        $initCommandPattern = [regex]::Escape("Import-Module -Name `"$initScript`" -Global")
 
-        # Remove the line containing the initialization command
-        $newProfileContent = $profileContent -replace [regex]::Escape($initCommand) + "`r?`n?", ""
+        # Filter out the line containing the initialization command
+        $newProfileContent = $profileContent | Where-Object { $_ -notmatch $initCommandPattern }
 
         # Write the updated content back to the profile
         Set-Content -Path $profilePath -Value $newProfileContent
@@ -64,13 +65,21 @@ function RemovePSModulePath {
     [System.Environment]::SetEnvironmentVariable('PSModulePath', $newPath, [System.EnvironmentVariableTarget]::User)
     Write-Output "Updated PSModulePath: $newPath"
 }
+
+function RemovePowerToolkitContent {
+    if (Test-Path $destinationDirectory) {
+        RemoveDirectories
+        RemovePSModulePath
+        RemoveInitializationFromProfile
+        Write-Output "Finished removing directories and cleaning up environment variables."
+    }
+    else {
+        Write-Output "The directory does not exist: $destinationDirectory"
+    }
+}
 #endregion
 
 #region Main
-Get-Role
-RemoveDirectories
-RemovePSModulePath
-RemoveInitializationFromProfile
+GetUserRole
+RemovePowerToolkitContent
 #endregion
-
-Write-Output "Finished removing directories and cleaning up environment variables."

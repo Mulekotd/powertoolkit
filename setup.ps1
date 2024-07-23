@@ -18,7 +18,7 @@ Get-ChildItem -Path `$modulePath -Filter *.psm1 | ForEach-Object {
 #endregion
 
 #region Functions
-function Add-InitializationToProfile {
+function AddInitializationToProfile {
     # Define the path to the initialization script
     $initScript = Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1"
     
@@ -128,14 +128,14 @@ function UpdatePSModulePath {
 
     [System.Environment]::SetEnvironmentVariable('PSModulePath', $newPath, [System.EnvironmentVariableTarget]::User)
     Write-Output "Updated PSModulePath with: $newPath"
-    Write-Output "Finished updating environment variables.`n"
+    Write-Output "Finished updating environment variables."
 }
 #endregion
 
 #region Main
 CreateDirectories
 GenerateInitializationScript
-Add-InitializationToProfile
+AddInitializationToProfile
 ImportModules
 UpdatePSModulePath
 #endregion
