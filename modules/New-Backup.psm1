@@ -1,6 +1,4 @@
-# Define Global Variables
-$username = [System.Environment]::UserName
-$backupLocation = "C:\Users\$username\.backups"
+. .\utils\Globals.ps1
 
 <#
 .SYNOPSIS
@@ -47,17 +45,19 @@ function New-Backup {
     # Checking if the path is a directory or a file
     if ($Directory.IsPresent) {
         if (-Not (Test-Path -Path $Path -PathType Container)) {
-            Write-Output "The specified path is not a valid directory."
+            Write-Host "ERROR: The specified path is not a valid directory." -ForegroundColor Red
             exit
         }
+
         $item = Get-Item -Path $lowercasePath
         $archiveName = $item.BaseName.ToLower().Replace(' ', '-')
         Write-Output "Starting backup of the directory: $Path"
     } else {
         if (-Not (Test-Path -Path $Path -PathType Leaf)) {
-            Write-Output "The specified path is not a valid file."
+            Write-Host "ERROR: The specified path is not a valid file." -ForegroundColor Red
             exit
         }
+
         $item = Get-Item -Path $lowercasePath
         $archiveName = [System.IO.Path]::GetFileNameWithoutExtension($item.Name).ToLower().Replace(' ', '-')
         Write-Output "Starting backup of the file: $Path"

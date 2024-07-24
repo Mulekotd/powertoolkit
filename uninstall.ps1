@@ -1,16 +1,9 @@
-#region Variables
-$username = [System.Environment]::UserName
-$destinationDirectory = "C:\Users\$username\PowerToolkit"
-$scriptsDirectory = Join-Path -Path $destinationDirectory -ChildPath "modules"
-$settingsDirectory = Join-Path -Path $scriptsDirectory -ChildPath ".settings"
-$initScript = Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1"
-#endregion
+. .\utils\Globals.ps1
 
 #region Functions
 function GetUserRole {
-    $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Output "This script requires administrative privileges. Please run as an administrator."
+        Write-Host "ERROR: This script requires administrative privileges. Please run as an administrator." -ForegroundColor Red
         exit
     }
 }
@@ -30,9 +23,7 @@ function RemoveDirectories {
     Write-Output "Directory removal completed.`n"
 }
 
-function RemoveInitializationFromProfile {
-    $profilePath = $PROFILE
-    
+function RemoveInitializationFromProfile {    
     if (Test-Path $profilePath) {
         $profileContent = Get-Content -Path $profilePath
         $initCommandPattern = [regex]::Escape("Import-Module -Name `"$initScript`" -Global")
@@ -45,7 +36,7 @@ function RemoveInitializationFromProfile {
         Write-Output "Removed initialization script from profile: $initScript`n"
     }
     else {
-        Write-Output "Profile file does not exist: $profilePath`n"
+        Write-Host "ERROR: Profile file does not exist: $profilePath`n" -ForegroundColor Red
     }
 }
 
@@ -74,7 +65,7 @@ function RemovePowerToolkitContent {
         Write-Output "Finished removing directories and cleaning up environment variables."
     }
     else {
-        Write-Output "The directory does not exist: $destinationDirectory"
+        Write-Host "ERROR: The directory does not exist: $destinationDirectory" -ForegroundColor Red
     }
 }
 #endregion

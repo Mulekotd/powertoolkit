@@ -1,13 +1,8 @@
+. .\utils\Globals.ps1
+
 #region Variables
-$username = [System.Environment]::UserName
+$rootDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-$currentDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
-$destinationDirectory = "C:\Users\$username\PowerToolkit"
-
-$scriptsDirectory = Join-Path -Path $destinationDirectory -ChildPath "modules"
-$settingsDirectory = Join-Path -Path $scriptsDirectory -ChildPath ".settings"
-
-# Create the initialization script
 $initScriptContent = @"
 # Import all modules from the specified directory
 `$modulePath = '$scriptsDirectory'
@@ -40,17 +35,17 @@ function AddInitializationToProfile {
             Add-Content -Path $profilePath -Value $initCommand
             Write-Output "Added initialization script to profile: $initScript`n"
         } else {
-            Write-Output "Initialization script is already in profile.`n"
+            Write-Warning "Initialization script is already in profile.`n"
         }
     } else {
-        Write-Output "Initialization script not found: $initScript`n"
+        Write-Host "ERROR: Initialization script not found: $initScript`n" -ForegroundColor Red
     }
 }
 
 function CreateDirectories {
     # Ensure the source directory exists
-    if (-not (Test-Path -Path $currentDirectory)) {
-        Write-Output "Source directory does not exist: $currentDirectory"
+    if (-not (Test-Path -Path $rootDirectory)) {
+        Write-Host "ERROR: Source directory does not exist: $rootDirectory" -ForegroundColor Red
         exit
     }
 
@@ -61,8 +56,8 @@ function CreateDirectories {
     }
 
     # Update the contents of the user's PowerToolkit directory with the current directory
-    Get-ChildItem -Path $currentDirectory -Recurse -Exclude '.git' | ForEach-Object {
-        $destinationPath = $_.FullName -replace [regex]::Escape($currentDirectory), [regex]::Escape($destinationDirectory)
+    Get-ChildItem -Path $rootDirectory -Recurse -Exclude '.git' | ForEach-Object {
+        $destinationPath = $_.FullName -replace [regex]::Escape($rootDirectory), [regex]::Escape($destinationDirectory)
         
         if ($_.PSIsContainer) {
             if (-not (Test-Path -Path $destinationPath)) {
@@ -73,7 +68,7 @@ function CreateDirectories {
         }
     }
     
-    Write-Output "Updated directory: $currentDirectory to $destinationDirectory`n"
+    Write-Output "Updated directory: $rootDirectory to $destinationDirectory`n"
 
     # Create modules\.settings if it doesn't exist
     if (-not (Test-Path -Path $settingsDirectory)) {
@@ -83,15 +78,14 @@ function CreateDirectories {
 
     # Ensure the 'modules' directory exists before proceeding
     if (-not (Test-Path -Path $scriptsDirectory)) {
-        Write-Output "'modules' directory does not exist: $scriptsDirectory"
+        Write-Host "ERROR: 'modules' directory does not exist: $scriptsDirectory" -ForegroundColor Red
         exit
     }
 }
 
 function GenerateInitializationScript {
-    $initScriptPath = Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1"
-    Set-Content -Path $initScriptPath -Value $initScriptContent
-    Write-Output "Generated initialization script: $initScriptPath"
+    Set-Content -Path $initScript -Value $initScriptContent
+    Write-Output "Generated initialization script: $initScript"
 }
 
 function ImportModules {
