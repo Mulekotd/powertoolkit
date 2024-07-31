@@ -3,7 +3,7 @@
 #region Functions
 function GetUserRole {
     if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Host "ERROR: This script requires administrative privileges. Please run as an administrator." -ForegroundColor Red
+        Write-Error -Message "ERROR: This script requires administrative privileges. Please run as an administrator." -Category PermissionDenied
         exit
     }
 }
@@ -36,7 +36,7 @@ function RemoveInitializationFromProfile {
         Write-Output "Removed initialization script from profile: $initScript`n"
     }
     else {
-        Write-Host "ERROR: Profile file does not exist: $profilePath`n" -ForegroundColor Red
+        Write-Error -Message "ERROR: Profile file does not exist: $profilePath`n" -Category ObjectNotFound
     }
 }
 
@@ -65,7 +65,7 @@ function RemovePowerToolkitContent {
         Write-Output "Finished removing directories and cleaning up environment variables."
     }
     else {
-        Write-Host "ERROR: The directory does not exist: $destinationDirectory" -ForegroundColor Red
+        Write-Error -Message "ERROR: The directory does not exist: $destinationDirectory" -Category ObjectNotFound
     }
 }
 #endregion

@@ -11,4 +11,3 @@ Set-Variable -Name "settingsDirectory" -Value (Join-Path -Path $scriptsDirectory
 
 # Files Variables
 Set-Variable -Name "initScript" -Value (Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1") -Scope Global
-

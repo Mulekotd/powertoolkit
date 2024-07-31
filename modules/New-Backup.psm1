@@ -27,25 +27,23 @@ Backups the specified file 'C:\MyFile.txt' to 'D:\Backups'.
 #>
 function New-Backup {
     param (
-    [Parameter(Mandatory = $false)]
-    [switch]$Directory,
+        [Parameter(Mandatory = $false)]
+        [switch]$Directory,
 
-    [Parameter(Mandatory = $false, Position = 0)]
-    [string]$Path,
+        [Parameter(Mandatory = $false, Position = 0)]
+        [string]$Path,
 
-    [Parameter(Mandatory = $false)]
-    [string]$BackupLocation = $backupLocation,
+        [Parameter(Mandatory = $false)]
+        [string]$BackupLocation = $backupLocation
+    )
 
-    [Parameter(Mandatory = $false)]
-    [switch]$Help
-)
     $lowercasePath = $Path.ToLower()
     $archiveName = ""
 
     # Checking if the path is a directory or a file
     if ($Directory.IsPresent) {
         if (-Not (Test-Path -Path $Path -PathType Container)) {
-            Write-Host "ERROR: The specified path is not a valid directory." -ForegroundColor Red
+            Write-Error -Message "ERROR: The specified path is not a valid directory." -Category InvalidType
             exit
         }
 
@@ -54,7 +52,7 @@ function New-Backup {
         Write-Output "Starting backup of the directory: $Path"
     } else {
         if (-Not (Test-Path -Path $Path -PathType Leaf)) {
-            Write-Host "ERROR: The specified path is not a valid file." -ForegroundColor Red
+            Write-Error -Message "ERROR: The specified path is not a valid file." -Category InvalidType
             exit
         }
 

@@ -3,7 +3,7 @@ function VerifyGitInstalled {
     $gitPath = (Get-Command git.exe -ErrorAction SilentlyContinue).Path
 
     if (-not $gitPath) {
-        Write-Host "ERROR: Git is not installed on this computer. Please install Git and try again.`n" -ForegroundColor Red
+        Write-Error -Message "ERROR: Git is not installed on this computer. Please install Git and try again." -Category NotInstalled
         exit 1
     }
     else {

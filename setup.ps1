@@ -1,8 +1,6 @@
 . .\utils\Globals.ps1
 
 #region Variables
-$rootDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
-
 $initScriptContent = @"
 # Import all modules from the specified directory
 `$modulePath = '$scriptsDirectory'
@@ -14,13 +12,9 @@ Get-ChildItem -Path `$modulePath -Filter *.psm1 | ForEach-Object {
 
 #region Functions
 function AddInitializationToProfile {
-    # Define the path to the initialization script
-    $initScript = Join-Path -Path $settingsDirectory -ChildPath "Initialize-PowerToolkit.psm1"
-    
     if (Test-Path $initScript) {
         # Use double quotes inside the profile command for correct parsing
         $initCommand = "Import-Module -Name `"$initScript`" -Global"
-        $profilePath = $PROFILE
 
         # Ensure the profile exists and create it if necessary
         if (-not (Test-Path $profilePath)) {
@@ -38,14 +32,14 @@ function AddInitializationToProfile {
             Write-Warning "Initialization script is already in profile.`n"
         }
     } else {
-        Write-Host "ERROR: Initialization script not found: $initScript`n" -ForegroundColor Red
+        Write-Error -Message "ERROR: Initialization script not found: $initScript`n" -Category ObjectNotFound
     }
 }
 
 function CreateDirectories {
     # Ensure the source directory exists
-    if (-not (Test-Path -Path $rootDirectory)) {
-        Write-Host "ERROR: Source directory does not exist: $rootDirectory" -ForegroundColor Red
+    if (-not (Test-Path -Path $pwd)) {
+        Write-Error -Message "ERROR: Source directory does not exist: $pwd" -Category ObjectNotFound
         exit
     }
 
@@ -56,8 +50,8 @@ function CreateDirectories {
     }
 
     # Update the contents of the user's PowerToolkit directory with the current directory
-    Get-ChildItem -Path $rootDirectory -Recurse -Exclude '.git' | ForEach-Object {
-        $destinationPath = $_.FullName -replace [regex]::Escape($rootDirectory), [regex]::Escape($destinationDirectory)
+    Get-ChildItem -Path $pwd -Recurse -Exclude '.git' | ForEach-Object {
+        $destinationPath = $_.FullName -replace [regex]::Escape($pwd), [regex]::Escape($destinationDirectory)
         
         if ($_.PSIsContainer) {
             if (-not (Test-Path -Path $destinationPath)) {
@@ -68,7 +62,7 @@ function CreateDirectories {
         }
     }
     
-    Write-Output "Updated directory: $rootDirectory to $destinationDirectory`n"
+    Write-Output "Updated directory: $pwd to $destinationDirectory`n"
 
     # Create modules\.settings if it doesn't exist
     if (-not (Test-Path -Path $settingsDirectory)) {
@@ -78,7 +72,7 @@ function CreateDirectories {
 
     # Ensure the 'modules' directory exists before proceeding
     if (-not (Test-Path -Path $scriptsDirectory)) {
-        Write-Host "ERROR: 'modules' directory does not exist: $scriptsDirectory" -ForegroundColor Red
+        Write-Error -Message "ERROR: 'modules' directory does not exist: $scriptsDirectory" -Category ObjectNotFound
         exit
     }
 }

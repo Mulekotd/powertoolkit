@@ -62,10 +62,14 @@ A script to create backups of files or directories.
 C:.
 │   LICENSE
 │   README.md
-│   setup.ps1
-│   uninstall.ps1
-│   update.ps1
+│   Setup.ps1
+│   Uninstall.ps1
+│   Update.ps1
 │
-└───modules
-        New-Backup.psm1
+├───modules
+│       Image-Compression.psm1
+│       New-Backup.psm1
+│
+└───utils
+        Globals.ps1
 ```
