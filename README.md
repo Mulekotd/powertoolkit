@@ -67,7 +67,6 @@ C:.
 │   Update.ps1
 │
 ├───modules
-│       Image-Compression.psm1
 │       New-Backup.psm1
 │
 └───utils
