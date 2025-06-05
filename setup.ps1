@@ -28,10 +28,12 @@ function AddInitializationToProfile {
         if (-not $profileContent -or -not $profileContent.Contains($initCommand)) {
             Add-Content -Path $profilePath -Value $initCommand
             Write-Output "Added initialization script to profile: $initScript`n"
-        } else {
+        }
+        else {
             Write-Warning "Initialization script is already in profile.`n"
         }
-    } else {
+    }
+    else {
         Write-Error -Message "ERROR: Initialization script not found: $initScript`n" -Category ObjectNotFound
     }
 }
@@ -57,7 +59,8 @@ function CreateDirectories {
             if (-not (Test-Path -Path $destinationPath)) {
                 New-Item -Path $destinationPath -ItemType Directory | Out-Null
             }
-        } else {
+        }
+        else {
             Copy-Item -Path $_.FullName -Destination $destinationPath -Force
         }
     }
@@ -108,9 +111,11 @@ function UpdatePSModulePath {
     # Ensure the path is properly formatted without leading semicolon
     if ($currentPath -eq "") {
         $newPath = $scriptsDirectory
-    } elseif ($currentPath.Split(';') -notcontains $scriptsDirectory) {
+    }
+    elseif ($currentPath.Split(';') -notcontains $scriptsDirectory) {
         $newPath = "$currentPath;$scriptsDirectory"
-    } else {
+    }
+    else {
         $newPath = $currentPath
     }
 

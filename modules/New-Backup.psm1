@@ -1,4 +1,4 @@
-. .\utils\Globals.ps1
+. (Join-Path -Path (Split-Path -Path $MyInvocation.MyCommand.Path -Parent) -ChildPath "..\utils\Globals.ps1")
 
 <#
 .SYNOPSIS
@@ -37,6 +37,14 @@ function New-Backup {
         [string]$BackupLocation = $backupLocation
     )
 
+    if (-not $PSBoundParameters.ContainsKey('Path')) {
+        Write-Warning "No path provided. Please specify the -Path parameter."
+        Write-Output "`nDisplaying help for New-Backup:`n"
+        Get-Help -Name New-Backup -Full
+        
+        return
+    }
+
     $lowercasePath = $Path.ToLower()
     $archiveName = ""
 
@@ -44,20 +52,22 @@ function New-Backup {
     if ($Directory.IsPresent) {
         if (-Not (Test-Path -Path $Path -PathType Container)) {
             Write-Error -Message "ERROR: The specified path is not a valid directory." -Category InvalidType
-            exit
+            return
         }
 
         $item = Get-Item -Path $lowercasePath
         $archiveName = $item.BaseName.ToLower().Replace(' ', '-')
+
         Write-Output "Starting backup of the directory: $Path"
     } else {
         if (-Not (Test-Path -Path $Path -PathType Leaf)) {
             Write-Error -Message "ERROR: The specified path is not a valid file." -Category InvalidType
-            exit
+            return
         }
 
         $item = Get-Item -Path $lowercasePath
         $archiveName = [System.IO.Path]::GetFileNameWithoutExtension($item.Name).ToLower().Replace(' ', '-')
+        
         Write-Output "Starting backup of the file: $Path"
     }
 

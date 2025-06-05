@@ -1,3 +1,6 @@
+if ($global:PowerToolkitGlobalsLoaded) { return }
+$global:PowerToolkitGlobalsLoaded = $true
+
 # User Variables
 Set-Variable -Name "username" -Value ([System.Environment]::UserName) -Scope Global
 Set-Variable -Name "currentUser" -Value (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())) -Scope Global

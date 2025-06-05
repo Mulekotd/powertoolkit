@@ -13,7 +13,7 @@ function VerifyGitInstalled {
 
 function UpdateGitRepository {
     Write-Output "Fetching latest changes..."
-    git.exe fetch | Out-Null
+    git.exe fetch --all | Out-Null
     Write-Output "Pulling latest changes...`n"
     git.exe pull
 }
