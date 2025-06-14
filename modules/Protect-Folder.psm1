@@ -1,5 +1,3 @@
-. (Join-Path -Path (Split-Path -Path $MyInvocation.MyCommand.Path -Parent) -ChildPath "..\utils\Globals.ps1")
-
 <#
 .SYNOPSIS
 Protects or lists folders by changing their attributes to hidden and system.
@@ -14,15 +12,15 @@ Specifies the action to perform:
 - Unlock: Removes protection attributes.
 - List: Lists all subfolders and shows which ones are protected.
 
-.PARAMETER FolderPath
+.PARAMETER Path
 The path of the folder to protect, unlock, or list. Defaults to the current directory if not specified.
 
 .EXAMPLE
-Protect-Folder -Action Lock -FolderPath 'C:\SecretFolder'
+Protect-Folder -Action Lock -Path 'C:\SecretFolder'
 Locks and protects the folder 'C:\SecretFolder'.
 
 .EXAMPLE
-Protect-Folder -Action Unlock -FolderPath 'C:\SecretFolder'
+Protect-Folder -Action Unlock -Path 'C:\SecretFolder'
 Unlocks and makes the folder 'C:\SecretFolder' visible.
 
 .EXAMPLE
@@ -40,10 +38,10 @@ function Protect-Folder {
         [ValidateSet('Lock', 'Unlock', 'List')]
         [string]$Action,
 
-        [string]$FolderPath = "."
+        [string]$Path = "."
     )
 
-    $privateFolder = (Resolve-Path -Path $FolderPath -ErrorAction SilentlyContinue)?.Path
+    $privateFolder = (Resolve-Path -Path $Path -ErrorAction SilentlyContinue)?.Path
 
     if (-not $privateFolder) {
         Write-Host "Specified folder does not exist." -ForegroundColor Red
@@ -51,7 +49,7 @@ function Protect-Folder {
     }
 
     if ($Action -eq "List") {
-        $folders = Get-ChildItem -Path $FolderPath -Directory -Force
+        $folders = Get-ChildItem -Path $Path -Directory -Force
 
         foreach ($folder in $folders) {
             try {
